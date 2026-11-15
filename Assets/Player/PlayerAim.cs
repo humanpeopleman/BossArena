@@ -22,6 +22,6 @@ public class PlayerAim : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, transform.position + (Vector3)AimDirection * 2f);
+        Gizmos.DrawLine(transform.position, transform.position + (Vector3)AimDirection * 1f);
     }
 }
