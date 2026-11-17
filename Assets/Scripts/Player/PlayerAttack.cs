@@ -19,6 +19,11 @@ public class PlayerAttack : MonoBehaviour
     private void Awake()
     {
         playerAim = GetComponent<PlayerAim>();
+        if (playerAim == null)
+        {
+            Debug.LogError("PlayerAim 컴포넌트를 찾을 수 없습니다.");
+            enabled = false; // 컴포넌트 비활성화
+        }
     }
 
     private void Update()
@@ -36,13 +41,13 @@ public class PlayerAttack : MonoBehaviour
         if (Time.time < nextAttackTime) return;
         nextAttackTime = Time.time + attackCooldown;
         // 공격 판정 실행
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPosition, attackRadius);
-        foreach (Collider2D obj in hitEnemies) {
-            if (!obj.CompareTag("Enemy")) continue;
-            EnemyHealth enemyHealth = obj.GetComponent<EnemyHealth>();
-            if (enemyHealth == null) continue;
-            enemyHealth.TakeDamage(attackDamage);
-            Debug.Log($"플레이어가 적에게 {attackDamage}만큼 피해를 입혔습니다.");
+        Collider2D[] hitBosses = Physics2D.OverlapCircleAll(attackPosition, attackRadius);
+        foreach (Collider2D obj in hitBosses) {
+            if (!obj.CompareTag("Boss")) continue;
+            BossHealth bossHealth = obj.GetComponent<BossHealth>();
+            if (bossHealth == null) continue;
+            bossHealth.TakeDamage(attackDamage);
+            Debug.Log($"플레이어가 보스에게 {attackDamage}만큼 피해를 입혔습니다.");
         }
     }
 

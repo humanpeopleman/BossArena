@@ -1,0 +1,190 @@
+﻿using UnityEngine;
+
+public class BossAttack : MonoBehaviour
+{
+    // 공격 패턴 열거형
+    private enum AttackPattern
+    {
+        Charge,
+        Shockwave,
+        FanSweep
+    }
+    private AttackPattern currentPattern;
+
+    // 컴포넌트 참조
+    private Rigidbody2D rb;
+
+    // 플레이어 충돌 처리
+    private Collider2D bossCollider;
+    private Collider2D playerCollider;
+
+    // 플레이어 공격 판정
+    private bool hasHitPlayer;
+    // 공격 대상
+    [SerializeField] private Transform player;
+
+    // 공통 공격 설정   
+    [SerializeField] private float attackDamage = 20f;
+
+    // 돌진 설정
+    private bool isCharging = false;
+    [SerializeField] private float chargeSpeed = 8f;
+    [SerializeField] private float chargeDuration = 0.7f;
+    [SerializeField] private float chargeRadius = 1.2f;
+
+    // 벽 충돌 검사
+    private ContactFilter2D wallFilter;
+    [SerializeField] private LayerMask wallLayer;
+    [SerializeField] private float wallCheckDistance = 0.02f;
+    private RaycastHit2D[] hitResults = new RaycastHit2D[5];
+
+    private Vector2 chargeDirection;
+    private float chargeTimer;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        bossCollider = GetComponent<Collider2D>();
+        if (rb == null || player == null || bossCollider == null)
+        {
+            Debug.LogError("필요한 컴포넌트를 찾을 수 없습니다.");
+            enabled = false; // 컴포넌트 비활성화
+            return;
+        }
+        playerCollider = player.GetComponent<Collider2D>();
+        if (playerCollider == null)
+        {
+            Debug.LogError("플레이어의 Collider2D를 찾을 수 없습니다.");
+            enabled = false; // 컴포넌트 비활성화
+            return;
+        }
+        InitializeWallFilter(); 
+    }
+    private void FixedUpdate()
+    {
+        if (isCharging)
+        {
+            if (chargeTimer >= chargeDuration)
+            {
+                EndCharge();
+                return;
+            }
+            MoveCharge();
+            chargeTimer += Time.fixedDeltaTime;
+        }
+    }
+    // 현재 선택된 공격 패턴
+    // 추후 Charge, Shockwave, FanSweep 추가
+
+    // 공격 패턴 선택
+    public void SelectAttack()
+    {
+        AttackPattern[] patterns = { 
+            AttackPattern.Charge, 
+            AttackPattern.Shockwave
+        };
+        int index = Random.Range(0, patterns.Length);
+        currentPattern = patterns[index];
+        Debug.Log($"보스가 {currentPattern} 공격 패턴을 선택했습니다.");
+    }
+    // 선택한 공격 실행
+    public void ExecuteAttack()
+    {
+        switch (currentPattern)
+        {
+            case AttackPattern.Charge:
+                ChargeAttack();
+                break;
+            case AttackPattern.Shockwave:
+                ShockwaveAttack();
+                break;
+            case AttackPattern.FanSweep:
+                FanSweepAttack();
+                break;
+            default:
+                Debug.LogWarning("알 수 없는 공격 패턴입니다.");
+                break;
+        }
+    }
+    private void ChargeAttack()
+    {
+        // 돌진 공격
+        hasHitPlayer = false;
+        SetPlayerCollision(false); // 플레이어와의 충돌 무시
+        chargeDirection = (player.position - transform.position).normalized;
+        isCharging = true;
+        chargeTimer = 0f;
+        Debug.Log("보스가 돌진 공격을 실행합니다.");
+    }
+    private void MoveCharge()
+    {
+        float moveDistance = chargeSpeed * Time.fixedDeltaTime;
+        bool isWallHit;
+        moveDistance = CheckWallCollision(moveDistance, out isWallHit);
+        CheckPlayerHit(moveDistance);
+        if (isWallHit) EndCharge();
+        rb.MovePosition(rb.position + chargeDirection * moveDistance);
+
+    }
+    private void EndCharge()
+    {
+        isCharging = false;
+        SetPlayerCollision(true); // 플레이어와의 충돌 복원
+    }
+    private void ShockwaveAttack()
+    {
+        // 충격파 공격
+        Debug.Log("보스가 충격파 공격을 실행합니다.");
+    }
+    private void FanSweepAttack()
+    {
+        // 부채꼴 공격
+        Debug.Log("보스가 부채꼴 공격을 실행합니다.");
+    }
+
+    private void InitializeWallFilter()
+    {
+        wallFilter = new ContactFilter2D();
+        wallFilter.SetLayerMask(wallLayer);
+        wallFilter.useTriggers = false;
+    }
+    private float CheckWallCollision(float moveDistance, out bool isWallHit)
+    {
+        isWallHit = false;
+        int hitCount = rb.Cast(chargeDirection, wallFilter, hitResults, moveDistance);
+        if (hitCount > 0)
+        {
+            if (Vector2.Dot(hitResults[0].normal, chargeDirection) < 0)
+            {
+                isWallHit = true;
+            }
+            for (int i = 0; i < hitCount; i++)
+            {
+                moveDistance = Mathf.Max(Mathf.Min(moveDistance, hitResults[i].distance - wallCheckDistance), 0f);
+            }
+        }
+        return moveDistance;
+    }
+    private void SetPlayerCollision(bool enabled)
+    {
+        Physics2D.IgnoreCollision(bossCollider, playerCollider, !enabled);
+    }
+    private void CheckPlayerHit(float moveDistance)
+    {
+        // 이미 피해를 줬다면 검사하지 않기
+        if (hasHitPlayer) return;
+        // 돌진 경로에서 플레이어와 겹치는지 검사
+        RaycastHit2D hit = Physics2D.CircleCast(bossCollider.bounds.center, chargeRadius, chargeDirection, moveDistance, LayerMask.GetMask("Player"));
+        // 플레이어에게 피해 적용
+        if (hit.collider != null && hit.collider.CompareTag("Player"))
+        {
+            PlayerHealth playerHealth = hit.collider.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(attackDamage);
+                hasHitPlayer = true;
+                Debug.Log($"보스가 플레이어에게 {attackDamage}만큼 피해를 입혔습니다.");
+            }
+        }
+    }
+}

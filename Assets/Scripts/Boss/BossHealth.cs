@@ -1,14 +1,17 @@
 ﻿
 using UnityEngine;
 
-public class EnemyHealth : MonoBehaviour
+public class BossHealth : MonoBehaviour
 {
     // 체력 설정
-    [SerializeField] private float maxHealth = 100f;
+    [SerializeField] private float maxHealth = 500f;
+    public float MaxHealth => maxHealth;
 
     // 현재 상태
     private float currentHealth;
+    public float CurrentHealth => currentHealth;
     private bool isDead;
+    public event System.Action OnBossDead;
 
     private void Awake()
     {
@@ -30,6 +33,7 @@ public class EnemyHealth : MonoBehaviour
     {
         // 사망 처리
         isDead = true;
+        OnBossDead?.Invoke();
         Destroy(gameObject);
     }
 }
