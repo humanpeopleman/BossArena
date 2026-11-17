@@ -650,6 +650,7 @@ GameObject:
   - component: {fileID: 971032986}
   - component: {fileID: 971032987}
   - component: {fileID: 971032988}
+  - component: {fileID: 971032989}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -846,6 +847,19 @@ MonoBehaviour:
   attackRadius: 0.5
   attackCooldown: 0.5
   attackDamage: 20
+--- !u!114 &971032989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 971032981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bf1d646f9b79054d863891a61a232a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  maxHealth: 100
 --- !u!1 &1076108952
 GameObject:
   m_ObjectHideFlags: 0
@@ -856,9 +870,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1076108957}
   - component: {fileID: 1076108956}
-  - component: {fileID: 1076108955}
   - component: {fileID: 1076108954}
   - component: {fileID: 1076108953}
+  - component: {fileID: 1076108955}
+  - component: {fileID: 1076108958}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -1027,6 +1042,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1076108958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1076108952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2593554d1cffe574da8a00a971a52da1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAttack
+  attackRange: 1.5
+  attackDamage: 10
+  attackCooldown: 1
+  player: {fileID: 971032985}
 --- !u!1 &1241550225
 GameObject:
   m_ObjectHideFlags: 0

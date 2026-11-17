@@ -33,8 +33,7 @@ public class PlayerAttack : MonoBehaviour
     private void Attack()
     {
         // 쿨다운 확인
-        if (Time.time < nextAttackTime)
-            return;
+        if (Time.time < nextAttackTime) return;
         nextAttackTime = Time.time + attackCooldown;
         // 공격 판정 실행
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPosition, attackRadius);
@@ -43,11 +42,11 @@ public class PlayerAttack : MonoBehaviour
             EnemyHealth enemyHealth = obj.GetComponent<EnemyHealth>();
             if (enemyHealth == null) continue;
             enemyHealth.TakeDamage(attackDamage);
-            Debug.Log("적 공격");
+            Debug.Log($"플레이어가 적에게 {attackDamage}만큼 피해를 입혔습니다.");
         }
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         // 공격 범위 시각화
         Gizmos.color = Color.red;
