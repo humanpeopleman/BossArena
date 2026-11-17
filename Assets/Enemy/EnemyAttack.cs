@@ -3,6 +3,7 @@
 public class EnemyAttack : MonoBehaviour
 {
     [SerializeField] private float attackRange = 1.5f;
+    public float AttackRange => attackRange;
     [SerializeField] private float attackDamage = 10f;
     [SerializeField] private float attackCooldown = 1f;
 

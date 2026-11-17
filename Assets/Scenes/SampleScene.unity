@@ -874,6 +874,7 @@ GameObject:
   - component: {fileID: 1076108953}
   - component: {fileID: 1076108955}
   - component: {fileID: 1076108958}
+  - component: {fileID: 1076108959}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -889,7 +890,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1076108952}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -1057,6 +1058,20 @@ MonoBehaviour:
   attackRange: 1.5
   attackDamage: 10
   attackCooldown: 1
+  player: {fileID: 971032985}
+--- !u!114 &1076108959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1076108952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cc82173bc4bbc444abad907578a0053, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
+  moveSpeed: 2
   player: {fileID: 971032985}
 --- !u!1 &1241550225
 GameObject:
