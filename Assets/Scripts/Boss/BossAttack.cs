@@ -19,7 +19,7 @@ public class BossAttack : MonoBehaviour
     private Collider2D playerCollider;
 
     // 플레이어 공격 판정
-    private bool hasHitPlayer;
+    private bool hasHitPlayerDuringCharge;
     // 공격 대상
     [SerializeField] private Transform player;
 
@@ -77,6 +77,14 @@ public class BossAttack : MonoBehaviour
             chargeTimer += Time.fixedDeltaTime;
         }
     }
+    private void ApplyDamage(Collider2D target)
+    {
+        PlayerHealth playerHealth = target.GetComponent<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            playerHealth.TakeDamage(attackDamage);
+        }
+    }
     // 현재 선택된 공격 패턴
     // 추후 Charge, Shockwave, FanSweep 추가
 
@@ -112,7 +120,7 @@ public class BossAttack : MonoBehaviour
     private void ChargeAttack()
     {
         // 돌진 공격
-        hasHitPlayer = false;
+        hasHitPlayerDuringCharge = false;
         SetPlayerCollision(false); // 플레이어와의 충돌 무시
         chargeDirection = (player.position - transform.position).normalized;
         isCharging = true;
@@ -165,19 +173,14 @@ public class BossAttack : MonoBehaviour
     private void CheckPlayerHit(float moveDistance)
     {
         // 이미 피해를 줬다면 검사하지 않기
-        if (hasHitPlayer) return;
+        if (hasHitPlayerDuringCharge) return;
         // 돌진 경로에서 플레이어와 겹치는지 검사
-        RaycastHit2D hit = Physics2D.CircleCast(bossCollider.bounds.center, chargeRadius, chargeDirection, moveDistance, LayerMask.GetMask("Player"));
+        RaycastHit2D hit = Physics2D.CircleCast(bossCollider.bounds.center, chargeRadius, chargeDirection, moveDistance, playerLayer);
         // 플레이어에게 피해 적용
         if (hit.collider != null && hit.collider.CompareTag("Player"))
         {
-            PlayerHealth playerHealth = hit.collider.GetComponent<PlayerHealth>();
-            if (playerHealth != null)
-            {
-                playerHealth.TakeDamage(attackDamage);
-                hasHitPlayer = true;
-                Debug.Log($"보스가 플레이어에게 {attackDamage}만큼 피해를 입혔습니다.");
-            }
+            ApplyDamage(hit.collider);
+            hasHitPlayerDuringCharge = true; // 피해를 줬음을 기록
         }
     }
     private void ShockwaveAttack()
@@ -187,12 +190,7 @@ public class BossAttack : MonoBehaviour
         Collider2D collider = Physics2D.OverlapCircle(transform.position, shockwaveRadius, playerLayer);
         if (collider != null)
         {
-            PlayerHealth playerHealth = collider.GetComponent<PlayerHealth>();
-            if (playerHealth != null)
-            {
-                playerHealth.TakeDamage(attackDamage);
-                Debug.Log($"보스가 플레이어에게 {attackDamage}만큼 피해를 입혔습니다.");
-            }
+            ApplyDamage(collider);
         }
     }
     private void FanSweepAttack()
