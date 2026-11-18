@@ -651,7 +651,7 @@ GameObject:
   - component: {fileID: 971032987}
   - component: {fileID: 971032988}
   - component: {fileID: 971032989}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1060,6 +1060,10 @@ MonoBehaviour:
   chargeSpeed: 8
   chargeDuration: 0.7
   chargeRadius: 0.5
+  shockwaveRadius: 3
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 8
   wallLayer:
     serializedVersion: 2
     m_Bits: 64

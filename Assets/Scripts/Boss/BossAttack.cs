@@ -32,6 +32,10 @@ public class BossAttack : MonoBehaviour
     [SerializeField] private float chargeDuration = 0.7f;
     [SerializeField] private float chargeRadius = 1.2f;
 
+    // 충격파 설정 
+    [SerializeField] private float shockwaveRadius = 3f;
+    [SerializeField] private LayerMask playerLayer;
+
     // 벽 충돌 검사
     private ContactFilter2D wallFilter;
     [SerializeField] private LayerMask wallLayer;
@@ -85,7 +89,6 @@ public class BossAttack : MonoBehaviour
         };
         int index = Random.Range(0, patterns.Length);
         currentPattern = patterns[index];
-        Debug.Log($"보스가 {currentPattern} 공격 패턴을 선택했습니다.");
     }
     // 선택한 공격 실행
     public void ExecuteAttack()
@@ -114,7 +117,6 @@ public class BossAttack : MonoBehaviour
         chargeDirection = (player.position - transform.position).normalized;
         isCharging = true;
         chargeTimer = 0f;
-        Debug.Log("보스가 돌진 공격을 실행합니다.");
     }
     private void MoveCharge()
     {
@@ -131,16 +133,7 @@ public class BossAttack : MonoBehaviour
         isCharging = false;
         SetPlayerCollision(true); // 플레이어와의 충돌 복원
     }
-    private void ShockwaveAttack()
-    {
-        // 충격파 공격
-        Debug.Log("보스가 충격파 공격을 실행합니다.");
-    }
-    private void FanSweepAttack()
-    {
-        // 부채꼴 공격
-        Debug.Log("보스가 부채꼴 공격을 실행합니다.");
-    }
+
 
     private void InitializeWallFilter()
     {
@@ -186,5 +179,25 @@ public class BossAttack : MonoBehaviour
                 Debug.Log($"보스가 플레이어에게 {attackDamage}만큼 피해를 입혔습니다.");
             }
         }
+    }
+    private void ShockwaveAttack()
+    {
+        // 충격파 공격
+        Debug.Log("보스가 충격파 공격을 실행합니다.");
+        Collider2D collider = Physics2D.OverlapCircle(transform.position, shockwaveRadius, playerLayer);
+        if (collider != null)
+        {
+            PlayerHealth playerHealth = collider.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(attackDamage);
+                Debug.Log($"보스가 플레이어에게 {attackDamage}만큼 피해를 입혔습니다.");
+            }
+        }
+    }
+    private void FanSweepAttack()
+    {
+        // 부채꼴 공격
+        Debug.Log("보스가 부채꼴 공격을 실행합니다.");
     }
 }
