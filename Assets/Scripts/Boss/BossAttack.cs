@@ -25,16 +25,18 @@ public class BossAttack : MonoBehaviour
 
     // 공통 공격 설정   
     [SerializeField] private float attackDamage = 20f;
+    private bool isAttackFinished = false;
 
     // 돌진 설정
-    private bool isCharging = false;
     [SerializeField] private float chargeSpeed = 8f;
     [SerializeField] private float chargeDuration = 0.7f;
     [SerializeField] private float chargeRadius = 1.2f;
+    private bool isCharging = false;
 
     // 충격파 설정 
     [SerializeField] private float shockwaveRadius = 3f;
     [SerializeField] private LayerMask playerLayer;
+    [SerializeField] private GameObject shockwaveIndicator;
 
     // 벽 충돌 검사
     private ContactFilter2D wallFilter;
@@ -45,6 +47,7 @@ public class BossAttack : MonoBehaviour
     private Vector2 chargeDirection;
     private float chargeTimer;
 
+    public bool IsAttackFinished => isAttackFinished; // 공격 중인지 여부를 외부에서 확인할 수 있도록 프로퍼티 제공
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -101,6 +104,7 @@ public class BossAttack : MonoBehaviour
     // 선택한 공격 실행
     public void ExecuteAttack()
     {
+        isAttackFinished = false;
         switch (currentPattern)
         {
             case AttackPattern.Charge:
@@ -111,6 +115,25 @@ public class BossAttack : MonoBehaviour
                 break;
             case AttackPattern.FanSweep:
                 FanSweepAttack();
+                break;
+            default:
+                Debug.LogWarning("알 수 없는 공격 패턴입니다.");
+                break;
+        }
+    }
+    public void StartTelegraph()
+    {
+        switch (currentPattern)
+        {
+            case AttackPattern.Charge:
+                Debug.Log("보스가 돌진 공격을 예고합니다.");
+                break;
+            case AttackPattern.Shockwave:
+                ShowShockwaveIndicator();
+                Debug.Log("보스가 충격파 공격을 예고합니다.");
+                break;
+            case AttackPattern.FanSweep:
+                Debug.Log("보스가 부채꼴 공격을 예고합니다.");
                 break;
             default:
                 Debug.LogWarning("알 수 없는 공격 패턴입니다.");
@@ -139,16 +162,12 @@ public class BossAttack : MonoBehaviour
     private void EndCharge()
     {
         isCharging = false;
+        isAttackFinished = true;
         SetPlayerCollision(true); // 플레이어와의 충돌 복원
     }
 
 
-    private void InitializeWallFilter()
-    {
-        wallFilter = new ContactFilter2D();
-        wallFilter.SetLayerMask(wallLayer);
-        wallFilter.useTriggers = false;
-    }
+  
     private float CheckWallCollision(float moveDistance, out bool isWallHit)
     {
         isWallHit = false;
@@ -187,15 +206,40 @@ public class BossAttack : MonoBehaviour
     {
         // 충격파 공격
         Debug.Log("보스가 충격파 공격을 실행합니다.");
+        HideShockwaveIndicator();
         Collider2D collider = Physics2D.OverlapCircle(transform.position, shockwaveRadius, playerLayer);
         if (collider != null)
         {
             ApplyDamage(collider);
+        }
+        isAttackFinished = true; // 공격 완료 처리
+    }
+    private void ShowShockwaveIndicator()
+    {
+        // 예고 원 활성화 및 위치 설정
+        if (shockwaveIndicator != null)
+        {
+            shockwaveIndicator.SetActive(true);
+        }
+    }
+
+    private void HideShockwaveIndicator()
+    {
+        // 예고 원 비활성화
+        if (shockwaveIndicator != null)
+        {
+            shockwaveIndicator.SetActive(false);
         }
     }
     private void FanSweepAttack()
     {
         // 부채꼴 공격
         Debug.Log("보스가 부채꼴 공격을 실행합니다.");
+    }
+    private void InitializeWallFilter()
+    {
+        wallFilter = new ContactFilter2D();
+        wallFilter.SetLayerMask(wallLayer);
+        wallFilter.useTriggers = false;
     }
 }

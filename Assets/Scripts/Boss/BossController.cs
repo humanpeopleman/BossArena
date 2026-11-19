@@ -67,6 +67,7 @@ public class BossController : MonoBehaviour
                 if (stateTimer >= idleDuration)
                 {
                     bossAttack.SelectAttack(); // 공격 패턴 선택
+                    bossAttack.StartTelegraph(); // 텔레그래프 시작
                     ChangeState(BossState.Telegraph);
                 }
                 break;
@@ -78,7 +79,7 @@ public class BossController : MonoBehaviour
                 }
                 break;
             case BossState.Attack:
-                if (stateTimer >= attackDuration)
+                if (bossAttack.IsAttackFinished)
                 {
                     ChangeState(BossState.Recovery);
                 }
