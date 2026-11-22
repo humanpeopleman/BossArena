@@ -32,6 +32,7 @@ public class BossAttack : MonoBehaviour
     [SerializeField] private float chargeDuration = 0.7f;
     [SerializeField] private float chargeRadius = 1.2f;
     private bool isCharging = false;
+    [SerializeField] private GameObject chargeIndicator;
 
     // 충격파 설정 
     [SerializeField] private float shockwaveRadius = 3f;
@@ -126,6 +127,8 @@ public class BossAttack : MonoBehaviour
         switch (currentPattern)
         {
             case AttackPattern.Charge:
+                chargeDirection = (player.position - transform.position).normalized;
+                ShowChargeIndicator();
                 Debug.Log("보스가 돌진 공격을 예고합니다.");
                 break;
             case AttackPattern.Shockwave:
@@ -145,7 +148,7 @@ public class BossAttack : MonoBehaviour
         // 돌진 공격
         hasHitPlayerDuringCharge = false;
         SetPlayerCollision(false); // 플레이어와의 충돌 무시
-        chargeDirection = (player.position - transform.position).normalized;
+        HideChargeIndicator();
         isCharging = true;
         chargeTimer = 0f;
     }
@@ -165,9 +168,24 @@ public class BossAttack : MonoBehaviour
         isAttackFinished = true;
         SetPlayerCollision(true); // 플레이어와의 충돌 복원
     }
+    private void ShowChargeIndicator()
+    {
+        if (chargeIndicator != null)
+        {
+            chargeIndicator.transform.position = transform.position + (Vector3)(chargeDirection * chargeDuration * chargeSpeed / 2);
+            chargeIndicator.transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(chargeDirection.y, chargeDirection.x) * Mathf.Rad2Deg);
+            chargeIndicator.SetActive(true);
+        }
+    }
+    private void HideChargeIndicator()
+    {
+        if (chargeIndicator != null)
+        {
+            chargeIndicator.SetActive(false);
+        }
+    }
 
 
-  
     private float CheckWallCollision(float moveDistance, out bool isWallHit)
     {
         isWallHit = false;
