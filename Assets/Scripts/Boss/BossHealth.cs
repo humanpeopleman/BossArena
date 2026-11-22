@@ -12,6 +12,7 @@ public class BossHealth : MonoBehaviour
     public float CurrentHealth => currentHealth;
     private bool isDead;
     public event System.Action OnBossDead;
+    public event System.Action OnHealthChanged;
 
     private void Awake()
     {
@@ -25,6 +26,7 @@ public class BossHealth : MonoBehaviour
         if (isDead || damage <= 0) return;
         // 체력 감소
         currentHealth = Mathf.Max(0, currentHealth - damage);
+        OnHealthChanged?.Invoke();
         // 체력이 0 이하라면 사망 처리
         if (currentHealth <= 0) Die();
     }

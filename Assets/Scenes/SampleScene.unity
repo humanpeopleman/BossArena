@@ -211,6 +211,112 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!1 &404839924
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 404839925}
+  - component: {fileID: 404839927}
+  - component: {fileID: 404839926}
+  - component: {fileID: 404839928}
+  m_Layer: 0
+  m_Name: FanSweepIndicator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &404839925
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 404839924}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1076108957}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &404839926
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 404839924}
+  m_Mesh: {fileID: 0}
+--- !u!23 &404839927
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 404839924}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 4294967295
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: aa0c8683d4e4d334f81c2e710f004b87, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &404839928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 404839924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7e096fe4040b0f4792f806b1f98f76f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FanSweepIndicator
+  radius: 4
+  angle: 90
+  segments: 30
 --- !u!1 &472932872
 GameObject:
   m_ObjectHideFlags: 0
@@ -1030,7 +1136,7 @@ MonoBehaviour:
   attackDistance: 1
   attackRadius: 0.5
   attackCooldown: 0.5
-  attackDamage: 20
+  attackDamage: 10
 --- !u!114 &971032989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1151,7 +1257,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4247f8418a745ce4ba56d451108a6d39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 100
+  maxHealth: 500
 --- !u!212 &1076108956
 SpriteRenderer:
   serializedVersion: 3
@@ -1227,6 +1333,7 @@ Transform:
   m_Children:
   - {fileID: 925889694}
   - {fileID: 150911902}
+  - {fileID: 404839925}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1076108958
@@ -1252,6 +1359,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   shockwaveIndicator: {fileID: 925889692}
+  fanSweepRadius: 4
+  fanSweepAngle: 90
+  fanSweepIndicator: {fileID: 404839924}
   wallLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -1268,9 +1378,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56d96955dc5be5541a7d1e71f80ecb8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossController
+  phaseChangeDuration: 2
+  phaseChangeThreshold: 0.5
   idleDuration: 1
   telegraphDuration: 1
-  attackDuration: 0.5
   recoveryDuration: 1.5
 --- !u!1 &1241550225
 GameObject:

@@ -24,7 +24,7 @@ public class BossAttack : MonoBehaviour
     [SerializeField] private Transform player;
 
     // 공통 공격 설정   
-    [SerializeField] private float attackDamage = 20f;
+    [SerializeField] private float attackDamage = 10f;
     private bool isAttackFinished = false;
 
     // 돌진 설정
@@ -39,13 +39,18 @@ public class BossAttack : MonoBehaviour
     [SerializeField] private LayerMask playerLayer;
     [SerializeField] private GameObject shockwaveIndicator;
 
+    // 부채꼴 공격 설정
+    [SerializeField] private float fanSweepRadius = 4f;
+    [SerializeField] private float fanSweepAngle = 90f;
+    [SerializeField] private GameObject fanSweepIndicator;
+
     // 벽 충돌 검사
     private ContactFilter2D wallFilter;
     [SerializeField] private LayerMask wallLayer;
     [SerializeField] private float wallCheckDistance = 0.02f;
     private RaycastHit2D[] hitResults = new RaycastHit2D[5];
 
-    private Vector2 chargeDirection;
+    private Vector2 attackDirection;
     private float chargeTimer;
 
     public bool IsAttackFinished => isAttackFinished; // 공격 중인지 여부를 외부에서 확인할 수 있도록 프로퍼티 제공
@@ -93,13 +98,22 @@ public class BossAttack : MonoBehaviour
     // 추후 Charge, Shockwave, FanSweep 추가
 
     // 공격 패턴 선택
-    public void SelectAttack()
+    public void SelectAttack(int phase)
     {
         AttackPattern[] patterns = { 
             AttackPattern.Charge, 
-            AttackPattern.Shockwave
+            AttackPattern.Shockwave,
+            AttackPattern.FanSweep
         };
-        int index = Random.Range(0, patterns.Length);
+        int index = 2;
+        if (phase == 1)
+        {
+            index = Random.Range(0, patterns.Length - 1);
+        }
+        else if (phase == 2)
+        {
+            index = Random.Range(0, patterns.Length);
+        }
         currentPattern = patterns[index];
     }
     // 선택한 공격 실행
@@ -127,7 +141,7 @@ public class BossAttack : MonoBehaviour
         switch (currentPattern)
         {
             case AttackPattern.Charge:
-                chargeDirection = (player.position - transform.position).normalized;
+                attackDirection = (player.position - transform.position).normalized;
                 ShowChargeIndicator();
                 Debug.Log("보스가 돌진 공격을 예고합니다.");
                 break;
@@ -136,6 +150,8 @@ public class BossAttack : MonoBehaviour
                 Debug.Log("보스가 충격파 공격을 예고합니다.");
                 break;
             case AttackPattern.FanSweep:
+                attackDirection = (player.position - transform.position).normalized;
+                ShowFanSweepIndicator();
                 Debug.Log("보스가 부채꼴 공격을 예고합니다.");
                 break;
             default:
@@ -159,7 +175,7 @@ public class BossAttack : MonoBehaviour
         moveDistance = CheckWallCollision(moveDistance, out isWallHit);
         CheckPlayerHit(moveDistance);
         if (isWallHit) EndCharge();
-        rb.MovePosition(rb.position + chargeDirection * moveDistance);
+        rb.MovePosition(rb.position + attackDirection * moveDistance);
 
     }
     private void EndCharge()
@@ -172,8 +188,8 @@ public class BossAttack : MonoBehaviour
     {
         if (chargeIndicator != null)
         {
-            chargeIndicator.transform.position = transform.position + (Vector3)(chargeDirection * chargeDuration * chargeSpeed / 2);
-            chargeIndicator.transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(chargeDirection.y, chargeDirection.x) * Mathf.Rad2Deg);
+            chargeIndicator.transform.position = transform.position + (Vector3)(attackDirection * chargeDuration * chargeSpeed / 2);
+            chargeIndicator.transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(attackDirection.y, attackDirection.x) * Mathf.Rad2Deg);
             chargeIndicator.SetActive(true);
         }
     }
@@ -189,10 +205,10 @@ public class BossAttack : MonoBehaviour
     private float CheckWallCollision(float moveDistance, out bool isWallHit)
     {
         isWallHit = false;
-        int hitCount = rb.Cast(chargeDirection, wallFilter, hitResults, moveDistance);
+        int hitCount = rb.Cast(attackDirection, wallFilter, hitResults, moveDistance);
         if (hitCount > 0)
         {
-            if (Vector2.Dot(hitResults[0].normal, chargeDirection) < 0)
+            if (Vector2.Dot(hitResults[0].normal, attackDirection) < 0)
             {
                 isWallHit = true;
             }
@@ -212,7 +228,7 @@ public class BossAttack : MonoBehaviour
         // 이미 피해를 줬다면 검사하지 않기
         if (hasHitPlayerDuringCharge) return;
         // 돌진 경로에서 플레이어와 겹치는지 검사
-        RaycastHit2D hit = Physics2D.CircleCast(bossCollider.bounds.center, chargeRadius, chargeDirection, moveDistance, playerLayer);
+        RaycastHit2D hit = Physics2D.CircleCast(bossCollider.bounds.center, chargeRadius, attackDirection, moveDistance, playerLayer);
         // 플레이어에게 피해 적용
         if (hit.collider != null && hit.collider.CompareTag("Player"))
         {
@@ -253,6 +269,33 @@ public class BossAttack : MonoBehaviour
     {
         // 부채꼴 공격
         Debug.Log("보스가 부채꼴 공격을 실행합니다.");
+        Collider2D collider = Physics2D.OverlapCircle(transform.position, fanSweepRadius, playerLayer); 
+        Vector2 directionToPlayer = ((Vector2)player.position - (Vector2)transform.position).normalized;
+        float angleToPlayer = Vector2.Angle(attackDirection, directionToPlayer);
+        if (collider != null && angleToPlayer <= fanSweepAngle / 2)
+        {
+            ApplyDamage(collider);
+        }
+        HideFanSweepIndicator();
+        isAttackFinished = true; // 공격 완료 처리
+    }
+    private void ShowFanSweepIndicator()
+    {
+        // 부채꼴 공격 예고 표시
+        if (fanSweepIndicator != null)
+        {
+            fanSweepIndicator.SetActive(true);
+            fanSweepIndicator.transform.position = transform.position;
+            fanSweepIndicator.transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(attackDirection.y, attackDirection.x) * Mathf.Rad2Deg);
+        }
+    }
+    private void HideFanSweepIndicator()
+    {
+        // 부채꼴 공격 예고 표시 숨기기
+        if (fanSweepIndicator != null)
+        {
+            fanSweepIndicator.SetActive(false);
+        }
     }
     private void InitializeWallFilter()
     {

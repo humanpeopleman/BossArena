@@ -14,9 +14,14 @@ public class BossController : MonoBehaviour
     }
     // 참조
     private BossAttack bossAttack;
-
+    private BossHealth bossHealth;
     // 현재 상태
     private BossState currentState;
+
+    // 페이즈
+    private int currentPhase = 1;
+    [SerializeField] private float phaseChangeDuration = 2f;
+    [SerializeField] private float phaseChangeThreshold = 0.5f;
 
     // 상태 진행 시간
     private float stateTimer;
@@ -24,14 +29,14 @@ public class BossController : MonoBehaviour
     // 상태별 소요 시간
     [SerializeField] private float idleDuration = 1f;
     [SerializeField] private float telegraphDuration = 1f;
-    [SerializeField] private float attackDuration = 0.5f;
     [SerializeField] private float recoveryDuration = 1.5f;
     private void Awake()
     {
         bossAttack = GetComponent<BossAttack>();
-        if (bossAttack == null)
+        bossHealth = GetComponent<BossHealth>();
+        if (bossAttack == null || bossHealth == null)
         {
-            Debug.LogError("BossAttack 컴포넌트를 할당해야 합니다.");
+            Debug.LogError("BossAttack 또는 BossHealth 컴포넌트를 할당해야 합니다.");
             enabled = false; // 컴포넌트 비활성화
         }
     }
@@ -60,13 +65,19 @@ public class BossController : MonoBehaviour
     {
         // 상태별 시간 및 전환 조건 처리
         stateTimer += Time.deltaTime;
-
+        if (currentPhase == 1 &&
+            currentState != BossState.PhaseChange &&
+             bossHealth.CurrentHealth <= bossHealth.MaxHealth * phaseChangeThreshold)
+        {
+            ChangeState(BossState.PhaseChange);
+            return;
+        }
         switch (currentState)
         {
             case BossState.Idle:
                 if (stateTimer >= idleDuration)
                 {
-                    bossAttack.SelectAttack(); // 공격 패턴 선택
+                    bossAttack.SelectAttack(currentPhase); // 공격 패턴 선택
                     bossAttack.StartTelegraph(); // 텔레그래프 시작
                     ChangeState(BossState.Telegraph);
                 }
@@ -87,6 +98,13 @@ public class BossController : MonoBehaviour
             case BossState.Recovery:
                 if (stateTimer >= recoveryDuration)
                 {
+                    ChangeState(BossState.Idle);
+                }
+                break;
+            case BossState.PhaseChange:
+                if (stateTimer >= phaseChangeDuration)
+                {
+                    currentPhase = 2;
                     ChangeState(BossState.Idle);
                 }
                 break;
