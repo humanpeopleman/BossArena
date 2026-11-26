@@ -47,7 +47,6 @@ public class PlayerAttack : MonoBehaviour
             BossHealth bossHealth = obj.GetComponent<BossHealth>();
             if (bossHealth == null) continue;
             bossHealth.TakeDamage(attackDamage);
-            Debug.Log($"플레이어가 보스에게 {attackDamage}만큼 피해를 입혔습니다.");
         }
     }
 

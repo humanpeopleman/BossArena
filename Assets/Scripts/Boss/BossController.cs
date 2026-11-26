@@ -65,6 +65,11 @@ public class BossController : MonoBehaviour
     {
         // 상태별 시간 및 전환 조건 처리
         stateTimer += Time.deltaTime;
+        if (currentState != BossState.Dead && bossHealth.CurrentHealth <= 0)
+        {
+            ChangeState(BossState.Dead);
+            return;
+        }
         if (currentPhase == 1 &&
             currentState != BossState.PhaseChange &&
              bossHealth.CurrentHealth <= bossHealth.MaxHealth * phaseChangeThreshold)

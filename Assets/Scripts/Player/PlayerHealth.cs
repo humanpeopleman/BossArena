@@ -1,11 +1,15 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
     [SerializeField] private float maxHealth = 100f;
+    public float MaxHealth => maxHealth;
     private float currentHealth;
+    public float CurrentHealth => currentHealth;
     private bool isDead = false;
-
+    public event Action OnPlayerDead;
+    public event Action OnPlayerHpChanged;
     private void Awake()
     {
         currentHealth = maxHealth;
@@ -15,16 +19,12 @@ public class PlayerHealth : MonoBehaviour
     {
         if (isDead || damage <= 0) return;
         currentHealth = Mathf.Max(0, currentHealth - damage);
-        Debug.Log($"플레이어가 {damage}만큼 피해를 입었습니다. 현재 체력: {currentHealth}");
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        OnPlayerHpChanged?.Invoke();
+        if (currentHealth <= 0) Die();
     }
     private void Die()
     {
         isDead = true;
-        Debug.Log("플레이어가 사망했습니다.");
-        // 사망 처리 로직 추가 (예: 게임 오버 화면, 리스폰 등)
+        OnPlayerDead?.Invoke();
     }
 }
