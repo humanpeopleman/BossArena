@@ -32,6 +32,5 @@ public class PlayerHitEffect : MonoBehaviour
             spriteRenderer.color = originalColor;
             isHitColor = false;
         }
-            
     }
 }

@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class BossHealth : MonoBehaviour
 {
+    private BossHitEffect bossHitEffect;
+
     // 체력 설정
     [SerializeField] private float maxHealth = 500f;
     public float MaxHealth => maxHealth;
@@ -16,6 +18,7 @@ public class BossHealth : MonoBehaviour
 
     private void Awake()
     {
+        bossHitEffect = GetComponent<BossHitEffect>();
         // 체력 초기화
         currentHealth = maxHealth;
     }
@@ -28,7 +31,12 @@ public class BossHealth : MonoBehaviour
         currentHealth = Mathf.Max(0, currentHealth - damage);
         OnBossHpChanged?.Invoke();
         // 체력이 0 이하라면 사망 처리
-        if (currentHealth <= 0) Die();
+        if (currentHealth <= 0)
+        {
+            Die();
+            return;
+        }
+        bossHitEffect.PlayHitBlink();
     }
 
     private void Die()
