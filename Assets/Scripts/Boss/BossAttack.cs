@@ -94,8 +94,6 @@ public class BossAttack : MonoBehaviour
             playerHealth.TakeDamage(attackDamage);
         }
     }
-    // 현재 선택된 공격 패턴
-    // 추후 Charge, Shockwave, FanSweep 추가
 
     // 공격 패턴 선택
     public void SelectAttack(int phase)
@@ -302,5 +300,24 @@ public class BossAttack : MonoBehaviour
         wallFilter = new ContactFilter2D();
         wallFilter.SetLayerMask(wallLayer);
         wallFilter.useTriggers = false;
+    }
+    public void CancelAttack()
+    {
+        // 돌진 중이었다면 돌진 종료
+        if (isCharging)
+        {
+            isCharging = false;
+            SetPlayerCollision(true);
+        }
+
+        // 모든 인디케이터 비활성화
+        HideChargeIndicator();
+        HideShockwaveIndicator();
+        HideFanSweepIndicator();
+
+        // 공격 상태 초기화
+        chargeTimer = 0f;
+        isAttackFinished = true;
+        hasHitPlayerDuringCharge = false;
     }
 }

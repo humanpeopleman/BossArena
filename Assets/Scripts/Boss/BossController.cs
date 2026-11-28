@@ -57,7 +57,6 @@ public class BossController : MonoBehaviour
         if (currentState == BossState.Dead) return; // 이미 사망 상태라면 상태 변경 불가
         // 상태 변경
         currentState = newState;
-        Debug.Log($"보스 상태 변경: {currentState}");
         stateTimer = 0f;
     }
 
@@ -74,6 +73,7 @@ public class BossController : MonoBehaviour
             currentState != BossState.PhaseChange &&
              bossHealth.CurrentHealth <= bossHealth.MaxHealth * phaseChangeThreshold)
         {
+            bossAttack.CancelAttack();
             ChangeState(BossState.PhaseChange);
             return;
         }

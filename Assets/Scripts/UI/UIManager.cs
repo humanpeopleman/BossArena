@@ -9,7 +9,12 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TMP_Text gameOverText;
-    [SerializeField] private Slider BossHpBar;
+    [SerializeField] private Slider BossHpBar; 
+    [SerializeField] private Slider BossDelayedHpBar;
+
+    [SerializeField] private float delayedHpSpeed = 100f;
+    [SerializeField] private float delayedHpDelay = 0.5f;
+    private float delayedHpTimer;
     [SerializeField] private Slider PlayerHpBar;
 
     public void ShowGameOver(string text)
@@ -36,9 +41,32 @@ public class UIManager : MonoBehaviour
             bossHealth.OnBossHpChanged += UpdateBossHpBar;
         if (playerHealth != null)
             playerHealth.OnPlayerHpChanged += UpdatePlayerHpBar;
+
         BossHpBar.maxValue = bossHealth.MaxHealth;
+
+        BossDelayedHpBar.maxValue = bossHealth.MaxHealth;
+
         PlayerHpBar.maxValue = playerHealth.MaxHealth;
         UpdatePlayerHpBar(); UpdateBossHpBar();
+    }
+    private void Start()
+    {
+        BossHpBar.value = bossHealth.CurrentHealth;
+        BossDelayedHpBar.value = bossHealth.CurrentHealth;
+        PlayerHpBar.value = playerHealth.CurrentHealth;
+    }
+    private void Update()
+    {
+        if (BossDelayedHpBar.value > BossHpBar.value)
+        {
+            delayedHpTimer += Time.deltaTime;
+            if (delayedHpTimer >= delayedHpDelay)
+            {
+                BossDelayedHpBar.value = Mathf.MoveTowards(BossDelayedHpBar.value, BossHpBar.value, delayedHpSpeed * Time.deltaTime);
+            }
+        }
+        else
+            delayedHpTimer = 0;
     }
     private void OnDestroy()
     {
